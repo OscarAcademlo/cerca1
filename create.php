@@ -1,4 +1,11 @@
 <?php
+session_start(); // Iniciar sesión
+if (!isset($_SESSION['nombre'])) {
+    header('Location: login.php'); // Redirigir si no está autenticado
+    exit;
+}
+
+
 include 'db.php'; // Incluir la conexión a la base de datos
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -20,12 +27,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     // Intentar mover la imagen al servidor
     if (move_uploaded_file($_FILES['imagen']['tmp_name'], $rutaImagen)) {
-        $sql = "INSERT INTO articulos (nombre, imagen, precio) VALUES ('$nombre', '$imagen', '$precio')";
-        if ($conexion->query($sql) === TRUE) {
+        $sql = "INSERT INTO articulos (nombre, imagen, precio) VALUES (?, ?, ?)";
+        $stmt = $conexion->prepare($sql);
+        $stmt->bind_param('ssd', $nombre, $imagen, $precio); // 'ssd' significa string, string, double
+        if ($stmt->execute()) {
             header("Location: admin.php");
             exit; // Detiene la ejecución después de la redirección
         } else {
-            echo "Error en la base de datos: " . $sql . "<br>" . $conexion->error;
+            echo "Error en la base de datos: " . $stmt->error;
         }
     } else {
         echo "Error al subir la imagen. Verifica los permisos del directorio 'img/'.";
@@ -55,7 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         </div>
         <div class="mb-3">
             <label for="precio" class="form-label">Precio del Artículo</label>
-            <input type="text" class="form-control" id="precio" name="precio" required>
+            <input type="number" step="0.01" class="form-control" id="precio" name="precio" required>
         </div>
         <!-- Botones de Crear y Volver a Home -->
         <button type="submit" class="btn btn-success">Crear Artículo</button>

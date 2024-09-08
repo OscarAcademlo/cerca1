@@ -1,10 +1,41 @@
 <?php
+session_start(); // Iniciar sesión
+
+// Verificar si el usuario está autenticado
+if (!isset($_SESSION['nombre'])) {
+    header('Location: login.php'); // Redirigir si no está autenticado
+    exit;
+}
+
 // Incluir el archivo de conexión a la base de datos
 include 'db.php';
+
+// Verificar que el usuario exista en la base de datos y esté autenticado
+$stmt = $conexion->prepare('SELECT * FROM usuarios WHERE nombre = ?');
+$stmt->bind_param('s', $_SESSION['nombre']);
+$stmt->execute();
+$result = $stmt->get_result();
+
+if ($result->num_rows > 0) {
+    $user = $result->fetch_assoc();
+
+    // Verificar si el usuario es válido
+    if (!isset($user['id'])) {
+        session_destroy(); // Destruir la sesión si el usuario no es válido
+        header('Location: login.php'); // Redirigir al formulario de inicio de sesión
+        exit;
+    }
+} else {
+    header('Location: login.php'); // Redirigir si el usuario no se encuentra
+    exit;
+}
 
 // Obtener los artículos de la base de datos
 $sql = "SELECT * FROM articulos";
 $result = $conexion->query($sql);
+
+// Cerrar la declaración preparada
+$stmt->close();
 ?>
 
 <!DOCTYPE html>
@@ -20,8 +51,8 @@ $result = $conexion->query($sql);
     <h1>Listado de Artículos</h1>
     <div class="mb-3">
         <a href="create.php" class="btn btn-primary">Agregar Nuevo Artículo</a>
-        <!-- Botón para volver al Home -->
         <a href="index.php" class="btn btn-secondary ms-2">Volver al Home</a>
+        <a href="logout.php" class="btn btn-danger ms-2">Cerrar Sesión</a> <!-- Botón para cerrar sesión -->
     </div>
     <table class="table">
         <thead>
@@ -54,7 +85,6 @@ $result = $conexion->query($sql);
     </table>
 </div>
 
-<!-- Scripts de Bootstrap -->
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" crossorigin="anonymous"></script>
 </body>

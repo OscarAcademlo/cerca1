@@ -1,4 +1,14 @@
 <?php
+
+
+session_start(); // Iniciar sesión
+if (!isset($_SESSION['nombre'])) {
+    header('Location: login.php'); // Redirigir si no está autenticado
+    exit;
+}
+
+
+
 include 'db.php';
 
 // Mostrar todos los errores
