@@ -21,10 +21,29 @@ $result = $conexion->query($sql);
             flex-direction: column;
             min-height: 100vh;
             margin: 0;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url('img/fondo-gastronomia.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0.15;
+            z-index: -1;
         }
 
         .container {
             flex: 1;
+            position: relative;
+            z-index: 1;
         }
 
         .row-cols-1 .col,
@@ -40,8 +59,9 @@ $result = $conexion->query($sql);
             flex-direction: column;
             justify-content: space-between;
             height: 100%;
-            max-width: 300px; /* Asegura que las tarjetas tengan el mismo ancho */
-            margin: auto; /* Centra las tarjetas horizontalmente */
+            max-width: 300px;
+            margin: auto;
+            background-color: rgba(255, 255, 255, 0.8);
         }
 
         .card img {
@@ -57,10 +77,18 @@ $result = $conexion->query($sql);
             flex-grow: 1;
         }
 
+        /* Estilos para el Navbar */
+        .navbar {
+            background-color: #f0f0f0; /* Tono de gris claro */
+        }
+
+        /* Estilos para el Footer */
         footer {
-            background-color: #f8f9fa;
+            background-color: #f0f0f0; /* Tono de gris claro */
             border-top: 1px solid #dee2e6;
             padding: 10px 0;
+            position: relative;
+            z-index: 1;
         }
 
         .cart-icon {
@@ -79,16 +107,18 @@ $result = $conexion->query($sql);
         }
 
         .modal-footer .btn {
-            margin-right: 10px; /* Añade margen entre los botones */
+            margin-right: 10px;
         }
     </style>
 </head>
 <body>
-
 <!-- Navbar -->
-<nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom shadow-sm">
+<nav class="navbar navbar-expand-lg  border-bottom shadow-sm"style="background-color: #e3f2fd;">
     <div class="container">
-        <a class="navbar-brand" href="index.php">Home</a>
+        <!-- Logo de la página -->
+        <a class="navbar-brand" href="index.php">
+            <img src="img/logo1.jpg" alt="Home" height="30">
+        </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -231,20 +261,20 @@ $result = $conexion->query($sql);
 
     function updateCartTotal() {
         let total = 0;
-        let itemCount = 0; // Contador de cantidad de productos
+        let itemCount = 0;
         for (const item in cart) {
             total += cart[item].price * cart[item].quantity;
-            itemCount += cart[item].quantity; // Sumar cantidad de cada producto
+            itemCount += cart[item].quantity;
         }
         document.getElementById('total').textContent = total;
-        document.getElementById('cartCount').textContent = itemCount; // Actualizar el contador del carrito
+        document.getElementById('cartCount').textContent = itemCount;
         document.getElementById('detalleCompra').textContent = `Total de la compra: $${total}`;
-        document.getElementById('totalPagar').textContent = total + 1600 + 2500; // Añadiendo costos fijos
+        document.getElementById('totalPagar').textContent = total + 1600 + 2500;
     }
 
     function emptyCart() {
-        cart = {}; // Vaciar el carrito
-        updateCartTotal(); // Actualizar el total del carrito
+        cart = {};
+        updateCartTotal();
     }
 
     function sendWhatsApp() {
